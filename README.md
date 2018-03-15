@@ -5,7 +5,7 @@ Save your password.
 
 ## Description
 サービス毎にIDとPasswordを確認するためのもの.
-パスワードを直接確認することは出来ない.
+Passwordを直接見ることは出来ない.
 
 ## Demo
 調整中.
