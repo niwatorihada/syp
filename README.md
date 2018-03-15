@@ -28,10 +28,9 @@ $ ./syp
 調整中.
 
 ## Licence
-
-[MIT](https://github.com/tcnksm/tool/blob/master/LICENCE)
+調整中.
 
 ## Author
 
-[tcnksm](https://github.com/tcnksm)
+[niwatorihada](https://github.com/niwatorihada)
 
