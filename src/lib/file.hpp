@@ -14,7 +14,11 @@ private:
     static std::ifstream ifs;
 
 public:
-    static void ofsOpen( const char* const file ) throw(int);
+    static bool checkFileExist( const char* const file);
+
+    static void ofsOpen( const char* const file) throw(int);
+    static void ofsOpen( const char* const file, char mode) throw(int);
+    static void ofsClose() throw(int);
     static void ifsOpen( const char* const file ) throw(int);
     static void ifsClose() throw(int);
     

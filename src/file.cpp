@@ -17,10 +17,35 @@
 std::ofstream File::ofs;
 std::ifstream File::ifs;
 
+bool File::checkFileExist(const char* const file) {
+    bool isOpen;
+    File::ifs.open(file);
+    isOpen = ifs.is_open();
+    if(isOpen) {
+        File::ifs.close();
+    }
+    return isOpen;
+}
+    
+
 void File::ofsOpen(const char* const file) throw(int) {
     File::ofs.open(file, std::ios::app);
     if(ofs.fail()) {
+        throw 0;
+    }
+}
+void File::ofsOpen(const char* const file, char mode) throw(int) {
+    if(mode == 'a') File::ofs.open(file, std::ios::app);
+    else if(mode == 'w')  File::ofs.open(file);
+    else File::ofs.open(file, std::ios::app);
+    if(ofs.fail()) {
         throw 1;
+    }
+}
+void File::ofsClose() throw(int) {
+    File::ofs.close();
+    if(ofs.fail()) {
+        throw 4;
     }
 }
 void File::ifsOpen(const char* const file) throw(int) {

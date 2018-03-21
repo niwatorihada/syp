@@ -21,6 +21,7 @@
 #include"./lib/option.hpp"
 #include"./register.cpp"
 #include"./list.cpp"
+#include"./remove.cpp"
 //
 
 #include"./lib/data.hpp"
@@ -30,7 +31,7 @@ std::map<char, Option>  mapInit(int argc, char*argv[]) {
     int opt;
     opterr = 0;
 
-    while( (opt = getopt(argc, argv, "alf") ) != -1) {
+    while( (opt = getopt(argc, argv, "alr") ) != -1) {
         switch(opt) {
             case 'a':
                 option.insert(std::make_pair('a', Register(true)));
@@ -38,13 +39,21 @@ std::map<char, Option>  mapInit(int argc, char*argv[]) {
             case 'l':
                 option.insert(std::make_pair('l', List(true)));
                 break;
+            case 'r':
+                option.insert(std::make_pair('r', Remove(true)));
+                break;
             default:
                 std::cout <<
-                    "Usage: "<< argv[0] << " [-a] [-l]"
+                    "Usage: "<< argv[0] << " [-a] [-l] [-r]"
                     << std::endl;
                 exit(0);
-                break;
         }
+    }
+    if(option.count('a') == 1 && option.count('r') == 1) {
+        std::cout <<
+            "Sorry! You can only use which option [-a] or [-r]."
+            << std::endl;
+        exit(0);
     }
 
     return option;
@@ -70,10 +79,11 @@ int main(int argc, char* argv[]) {
 
     // file開くところ
     try {
-        f.ofsOpen("test.txt");
-        f.ifsOpen("test.txt");
-        // read
-        f.read(alrady);
+        if(f.checkFileExist("test.txt")) {
+            f.ifsOpen("test.txt");
+            // read
+            f.read(alrady);
+        }
     } catch(int i) {
         ERROR(i,"file can't open");
         return i;
@@ -88,8 +98,9 @@ int main(int argc, char* argv[]) {
         if(option.count('a') == 0) {
             option.insert(std::make_pair('a', Register(true)));
         }
-        if(option.count('l') == 1) {
+        if(option.count('l') == 1 || option.count('r') == 1) {
             std::cout << "保存されているサービスは0です." << std::endl;
+            return 0;
         }
     }
     else {
@@ -106,7 +117,7 @@ int main(int argc, char* argv[]) {
     std::cout << "Service : ";
     // Service入力
     std::cin >> service;
-    //dataを格納
+    // dataを格納
     data.push_back(service);
 
     // ID入力してね
@@ -128,8 +139,19 @@ int main(int argc, char* argv[]) {
     data.push_back(input.password);
 
     // password確認
-    if(option.count('a') == 1) f.write(data);
+    if(option.count('a') == 1) {
+        try {
+            f.ofsOpen("test.txt", 'a');
+        } catch(int i) {
+            ERROR(i,"file can't open");
+            return i;
+        }
+
+        f.write(data);
+    }
     else {
+        data.clear();
+        int i=0;
         while(!alrady.empty()) {
             inst.password = alrady.back();
             alrady.pop_back();
@@ -147,6 +169,13 @@ int main(int argc, char* argv[]) {
                 check = true;
                 std::cout << inst_service << " Access!" << std::endl;
             }
+            else {
+                data.push_back(inst.password);
+                data.push_back(inst.id);
+                data.push_back(inst_service);
+            }
+
+            i+=3;
         }
     }
 
@@ -157,6 +186,16 @@ int main(int argc, char* argv[]) {
     // passwordが間違ってた時
     if(!check && option.count('a') == 0) {
         std::cout << "No matcing!" << std::endl;
+    }
+    if(option.count('r') == 1 && option.count('a') == 0) {
+        try {
+            f.ofsOpen("test.txt", 'w');
+        } catch(int i) {
+            ERROR(i,"file can't open");
+            return i;
+        }
+
+        f.write(data);
     }
 
     return 0;
