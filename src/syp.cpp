@@ -5,17 +5,40 @@
 #include<string>
 #include<vector>
 #include<map>
+#include<unistd.h>
 
 #include"./file.cpp"
 #include"./debug.cpp"
 #include"./sha256.cpp"
 #include"./password.cpp"
+#include"./lib/option.hpp"
+#include"./register.cpp"
 
 #include"./lib/data.hpp"
 
-int main() {
+std::map<char, Option>  mapInit(int argc, char*argv[]) {
+    std::map<char, Option> option;
+    int opt;
+    opterr = 0;
+
+    while( (opt = getopt(argc, argv, "af") ) != -1) {
+        switch(opt) {
+            case 'a':
+                option.insert(std::make_pair('a', Register(true)));
+                break;
+            default:
+                std::cout <<
+                    "Usage: "<< argv[0] << " [-a]"
+                    << std::endl;
+                break;
+        }
+    }
+
+    return option;
+}
+
+int main(int argc, char* argv[]) {
     // 宣言
-    bool regi = false;
     bool check = false;
     std::string y;
     Data input;
@@ -25,9 +48,12 @@ int main() {
     std::vector< std::string > data;
     std::vector< std::string > alrady;
     File f;
-    
+    std::map<char, Option> option;
+
     // データ保存用のmultimap：同じキーを複数使える
     //std::multimap<std::string, Data> map;
+    
+    option = mapInit(argc, argv);
 
     // file開くところ
     try {
@@ -45,18 +71,10 @@ int main() {
         ERROR(alrady.size()%3, "what's data?");
         return alrady.size()%3;
     }
-    if(alrady.empty()) {
-        regi = true;
+    if(alrady.empty() && option.count('a') == 0) {
+        option.insert(std::make_pair('a', Register(true)));
     }
-    else {
-        // registor?
-        std::cout << "registration?(y/n): ";
-        std::cin >> y;
 
-        if(y == "y") {
-            regi = true;
-        }
-    }
 
     // Service入力してね
     std::cout << "Service : ";
@@ -84,7 +102,7 @@ int main() {
     data.push_back(input.password);
 
     // password確認
-    if(regi) f.write(data);
+    if(option.count('a') == 1) f.write(data);
     else {
         while(!alrady.empty()) {
             inst.password = alrady.back();
@@ -111,7 +129,7 @@ int main() {
     // passwordが合ってた時
 
     // passwordが間違ってた時
-    if(!check && !regi) {
+    if(!check && option.count('a') == 0) {
         std::cout << "No matcing!" << std::endl;
     }
 
