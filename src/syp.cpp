@@ -1,18 +1,27 @@
 /**
  * login
  **/
+// c++
 #include<iostream>
 #include<string>
 #include<vector>
 #include<map>
-#include<unistd.h>
 
+// c
+#include<unistd.h>
+#include<stdlib.h>
+
+// 内部ライブラリ
 #include"./file.cpp"
 #include"./debug.cpp"
 #include"./sha256.cpp"
 #include"./password.cpp"
+
+// オプション //
 #include"./lib/option.hpp"
 #include"./register.cpp"
+#include"./list.cpp"
+//
 
 #include"./lib/data.hpp"
 
@@ -21,15 +30,19 @@ std::map<char, Option>  mapInit(int argc, char*argv[]) {
     int opt;
     opterr = 0;
 
-    while( (opt = getopt(argc, argv, "af") ) != -1) {
+    while( (opt = getopt(argc, argv, "alf") ) != -1) {
         switch(opt) {
             case 'a':
                 option.insert(std::make_pair('a', Register(true)));
                 break;
+            case 'l':
+                option.insert(std::make_pair('l', List(true)));
+                break;
             default:
                 std::cout <<
-                    "Usage: "<< argv[0] << " [-a]"
+                    "Usage: "<< argv[0] << " [-a] [-l]"
                     << std::endl;
+                exit(0);
                 break;
         }
     }
@@ -71,10 +84,23 @@ int main(int argc, char* argv[]) {
         ERROR(alrady.size()%3, "what's data?");
         return alrady.size()%3;
     }
-    if(alrady.empty() && option.count('a') == 0) {
-        option.insert(std::make_pair('a', Register(true)));
+    if(alrady.empty()) {
+        if(option.count('a') == 0) {
+            option.insert(std::make_pair('a', Register(true)));
+        }
+        if(option.count('l') == 1) {
+            std::cout << "保存されているサービスは0です." << std::endl;
+        }
     }
-
+    else {
+        if(option.count('l') == 1) {
+            for(int i=0;i<alrady.size();i+=3) {
+                printf("Service[%02d]: %s\n", i/3+1, alrady[i].c_str());
+                printf("     ID[%02d]: %s\n", i/3+1, alrady[i+1].c_str());
+            }
+            return 0;
+        }
+    }
 
     // Service入力してね
     std::cout << "Service : ";
