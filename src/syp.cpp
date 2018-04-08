@@ -26,6 +26,9 @@
 
 #include"./lib/data.hpp"
 
+const std::string TO_SAVE = getenv("HOME");
+const std::string FILE_NAME = "syp.txt";
+
 std::map<char, Option>  mapInit(int argc, char*argv[]) {
     std::map<char, Option> option;
     int opt;
@@ -71,6 +74,8 @@ int main(int argc, char* argv[]) {
     std::vector< std::string > alrady;
     File f;
     std::map<char, Option> option;
+    const char* fn = (TO_SAVE+"/"+FILE_NAME).c_str();
+    //DEBUG(fn);
 
     // データ保存用のmultimap：同じキーを複数使える
     //std::multimap<std::string, Data> map;
@@ -79,8 +84,8 @@ int main(int argc, char* argv[]) {
 
     // file開くところ
     try {
-        if(f.checkFileExist("test.txt")) {
-            f.ifsOpen("test.txt");
+        if(f.checkFileExist(fn)) {
+            f.ifsOpen(fn);
             // read
             f.read(alrady);
         }
@@ -97,6 +102,7 @@ int main(int argc, char* argv[]) {
     if(alrady.empty()) {
         if(option.count('a') == 0) {
             option.insert(std::make_pair('a', Register(true)));
+            std::cout << "セーブするファイルがありません.作成します." << std::endl;
         }
         if(option.count('l') == 1 || option.count('r') == 1) {
             std::cout << "保存されているサービスは0です." << std::endl;
@@ -141,7 +147,7 @@ int main(int argc, char* argv[]) {
     // password確認
     if(option.count('a') == 1) {
         try {
-            f.ofsOpen("test.txt", 'a');
+            f.ofsOpen(fn, 'a');
         } catch(int i) {
             ERROR(i,"file can't open");
             return i;
@@ -189,7 +195,7 @@ int main(int argc, char* argv[]) {
     }
     if(option.count('r') == 1 && option.count('a') == 0) {
         try {
-            f.ofsOpen("test.txt", 'w');
+            f.ofsOpen(fn, 'w');
         } catch(int i) {
             ERROR(i,"file can't open");
             return i;

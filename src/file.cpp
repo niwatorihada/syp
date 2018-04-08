@@ -26,7 +26,6 @@ bool File::checkFileExist(const char* const file) {
     }
     return isOpen;
 }
-    
 
 void File::ofsOpen(const char* const file) throw(int) {
     File::ofs.open(file, std::ios::app);
