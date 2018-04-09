@@ -73,15 +73,15 @@ int main(int argc, char* argv[]) {
     std::vector< std::string > data;
     std::vector< std::string > alrady;
     File f;
-    std::map<char, Option> option;
+
+    std::map<char, Option> option = mapInit(argc, argv);
+    // constしてから関数に飛ぶと値が消えた
     const char* fn = (TO_SAVE+"/"+FILE_NAME).c_str();
     //DEBUG(fn);
 
     // データ保存用のmultimap：同じキーを複数使える
     //std::multimap<std::string, Data> map;
     
-    option = mapInit(argc, argv);
-
     // file開くところ
     try {
         if(f.checkFileExist(fn)) {
